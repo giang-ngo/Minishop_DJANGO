@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +71,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'minishop.wsgi.application'
-
+AUTH_USER_MODEL='account.Account'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
