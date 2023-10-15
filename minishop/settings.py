@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account',
+    'category',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +73,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'minishop.wsgi.application'
-AUTH_USER_MODEL='account.Account'
+AUTH_USER_MODEL = 'account.Account'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -125,6 +126,9 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR/'staticfiles'
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR/'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
