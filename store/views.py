@@ -1,11 +1,16 @@
 from django.shortcuts import render
 from store.models import Product
 from django.db.models import Q
+from django.core.paginator import Paginator
+
 
 
 def store(request):
     products = Product.objects.all().filter(is_available=True)
-    context = {'products': products}
+    page = Paginator(products, 1)
+    page_list = request.GET.get('page')
+    page = page.get_page(page_list)
+    context = {'products': products, 'page': page}
     return render(request, 'store/store.html', context)
 
 def search(request):
