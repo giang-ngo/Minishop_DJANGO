@@ -1,4 +1,4 @@
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from store.models import Product
 from django.db.models import Q
 from django.core.paginator import Paginator
@@ -26,6 +26,14 @@ def store(request, category_slug=None):
     context = {'products': products, 'page': page,
                'product_count': product_count}
     return render(request, 'store/store.html', context)
+
+
+def product_detail(request, category_slug, product_slug):
+    single_product = Product.objects.get(
+        slug=product_slug, category__slug=category_slug)
+
+    context = {'single_product': single_product}
+    return render(request, 'store/product_detail.html', context)
 
 
 def search(request):

@@ -42,7 +42,7 @@
 					{% for product in page.object_list %}
 					<div class="col-sm-12 col-md-12 col-lg-4 ftco-animate d-flex">
 						<div class="product d-flex flex-column">
-							<a href="#" class="img-prod"><img class="img-fluid" src="{{product.image.url}}"
+							<a href="{{product.get_url}}" class="img-prod"><img class="img-fluid" src="{{product.image.url}}"
 									alt="Colorlib Template">
 								<div class="overlay"></div>
 							</a>
