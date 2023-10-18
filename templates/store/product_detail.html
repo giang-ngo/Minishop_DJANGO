@@ -6,7 +6,8 @@
     <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
             <div class="col-md-9 ftco-animate text-center">
-                <p class="breadcrumbs"><span class="mr-2"><a href="{% url 'home' %}">Home</a></span> <span>Shop</span></p>
+                <p class="breadcrumbs"><span class="mr-2"><a href="{% url 'home' %}">Home</a></span> <span>Shop</span>
+                </p>
                 <h1 class="mb-0 bread">Shop</h1>
             </div>
         </div>
@@ -20,67 +21,97 @@
                 <a href="images/product-1.png" class="image-popup prod-img-bg"><img src="{{single_product.image.url}}"
                         class="img-fluid" alt="Colorlib Template"></a>
             </div>
+
             <div class="col-lg-6 product-details pl-md-5 ftco-animate">
-                <h3>{{single_product.product_name}}</h3>
-                <div class="rating d-flex">
-                    <p class="text-left mr-4">
-                        <a href="#" class="mr-2">5.0</a>
-                        <a href="#"><span class="ion-ios-star-outline"></span></a>
-                        <a href="#"><span class="ion-ios-star-outline"></span></a>
-                        <a href="#"><span class="ion-ios-star-outline"></span></a>
-                        <a href="#"><span class="ion-ios-star-outline"></span></a>
-                        <a href="#"><span class="ion-ios-star-outline"></span></a>
-                    </p>
-                    <p class="text-left mr-4">
-                        <a href="#" class="mr-2" style="color: #000;">100 <span style="color: #bbb;">Rating</span></a>
-                    </p>
-                    <p class="text-left">
-                        <a href="#" class="mr-2" style="color: #000;">500 <span style="color: #bbb;">Sold</span></a>
-                    </p>
-                </div>
-                <p class="price"><span>${{single_product.price}}</span></p>
-                <p>{{single_product.description}}</p>
-               
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="form-group d-flex">
-                            <div class="select-wrap">
-                                <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-                                <select name="" id="" class="form-control">
-                                    <option value="">Small</option>
-                                    <option value="">Medium</option>
-                                    <option value="">Large</option>
-                                    <option value="">Extra Large</option>
-                                </select>
+                <form action="{% url 'add_cart' single_product.id %}" method="POST">
+                    {% csrf_token %}
+                    <h3>{{single_product.product_name}}</h3>
+                    <div class="rating d-flex">
+                        <p class="text-left mr-4">
+                            <a href="#" class="mr-2">5.0</a>
+                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                        </p>
+                        <p class="text-left mr-4">
+                            <a href="#" class="mr-2" style="color: #000;">100 <span
+                                    style="color: #bbb;">Rating</span></a>
+                        </p>
+                        <p class="text-left">
+                            <a href="#" class="mr-2" style="color: #000;">500 <span style="color: #bbb;">Sold</span></a>
+                        </p>
+                    </div>
+                    <p class="price"><span>${{single_product.price}}</span></p>
+                    <p>{{single_product.description}}</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="form-group d-flex">
+                                <div class="select-wrap">
+                                    <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                    <h6>Choose Color</h6>
+
+                                    <select name="color" id="" class="form-control" required>
+                                        <option value="" disabled selected>Select</option>
+                                        {% for i in single_product.variation_set.colors %}
+                                        <option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group d-flex">
+                                <div class="select-wrap">
+                                    <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                    <h6>Choose Size</h6>
+
+                                    <select name="size" id="" class="form-control" required>
+                                        <option value="" disabled selected>Select</option>
+
+                                        {% for i in single_product.variation_set.sizes %}
+                                        <option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         </div>
+                        <div class="w-100"></div>
+                        <div class="input-group col-md-6 d-flex mb-3">
+                            <!-- <span class="input-group-btn mr-2">
+                                <button type="button" class="quantity-left-minus btn" data-type="minus" data-field="">
+                                    <i class="ion-ios-remove"></i>
+                                </button>
+                            </span>
+                            <input type="text" id="quantity" name="quantity" class="quantity form-control input-number"
+                                value="1" min="1" max="100">
+                            <span class="input-group-btn ml-2">
+                                <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
+                                    <i class="ion-ios-add"></i>
+                                </button>
+                            </span> -->
+                        </div>
+                        <div class="w-100"></div>
+                        <div class="col-md-12">
+                            <p style="color: #000;">{{single_product.stock}} piece available</p>
+                        </div>
                     </div>
-                    <div class="w-100"></div>
-                    <div class="input-group col-md-6 d-flex mb-3">
-                        <span class="input-group-btn mr-2">
-                            <button type="button" class="quantity-left-minus btn" data-type="minus" data-field="">
-                                <i class="ion-ios-remove"></i>
-                            </button>
-                        </span>
-                        <input type="text" id="quantity" name="quantity" class="quantity form-control input-number"
-                            value="1" min="1" max="100">
-                        <span class="input-group-btn ml-2">
-                            <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
-                                <i class="ion-ios-add"></i>
-                            </button>
-                        </span>
-                    </div>
-                    <div class="w-100"></div>
-                    <div class="col-md-12">
-                        <p style="color: #000;">{{single_product.stock}} piece available</p>
-                    </div>
-                </div>
-                <p><a href="cart.html" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a><a href="cart.html"
-                        class="btn btn-primary py-3 px-5">Buy now</a></p>
+                    <p style="border-radius: 99px;display: flex;align-items: center;">
+                        <button style="justify-content: center;border-radius: 99px;display: inline-flex;
+                            align-items: center;margin-right: 10px;min-width: 142px;padding: 25px 16px;"
+                            type="submit">Add to
+                            Cart</button>
+
+                        <a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a>
+                    </p>
+                </form>
+
             </div>
         </div>
-
-
 
 
         <div class="row mt-5">
