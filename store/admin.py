@@ -17,4 +17,4 @@ class VariationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Product, ProductAdmin)
-admin.site.register(Variation)
+admin.site.register(Variation,VariationAdmin)

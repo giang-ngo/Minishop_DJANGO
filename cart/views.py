@@ -77,7 +77,6 @@ def add_cart(request, product_id):
                     variation = Variation.object.get(
                         product=product, variation_value__iexact=value, variation_category__iexact=key)
                     product_variation.append(variation)
-
                 except:
                     pass
 
