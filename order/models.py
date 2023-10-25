@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import Account
+from account.models import Account
 from store.models import Product, Variation
 
 # Create your models here.
@@ -48,7 +48,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user.first_name
+        return self.first_name
 
 
 class OrderProduct(models.Model):

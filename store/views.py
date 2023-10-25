@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from category.models import Category
 
 
+
 def store(request, category_slug=None):
     categories = None
     products = None
@@ -45,3 +46,6 @@ def search(request):
             product_count = products.count()
     context = {'products': products, 'product_count': product_count}
     return render(request, 'store/store.html', context)
+
+
+

@@ -4,6 +4,7 @@ from .models import Account
 from .forms import RegisterForm
 from cart.views import _cart_id
 from cart.models import Cart, CartItem
+import requests
 
 # active account
 from django.contrib.sites.shortcuts import get_current_site
@@ -62,6 +63,15 @@ def loginPage(request):
             except:
                 pass
             auth.login(request, user)
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    next_page = params['next']
+                    return redirect(next_page)
+            except:
+                return redirect('dashboard')
             return redirect('home')
         else:
             messages.error(request, 'Invalid login credentials.')
