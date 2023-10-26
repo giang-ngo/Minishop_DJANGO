@@ -1,0 +1,8 @@
+{% autoescape off %}
+
+Dear {{user.first_name}},
+
+Thank you for shopping at Minishop website!
+
+Your order #{{order.order_number}} has now been received.
+{% endautoescape %}

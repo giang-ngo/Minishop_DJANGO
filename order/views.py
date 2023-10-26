@@ -1,12 +1,79 @@
 from django.shortcuts import render, redirect
 from cart.models import CartItem
-from .models import Order
+from .models import Order, OrderProduct, Payment
 from .forms import OrderForm
 import datetime
+import json
+from store.models import Product
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from django.http import JsonResponse
 
 # Create your views here.
+
+
 def payments(request):
-    return render(request)
+    body = json.loads(request.body)
+    order = Order.objects.get(
+        user=request.user, is_ordered=False, order_number=body['orderID'])
+
+    # Lưu giao dịch bên trong Payment model
+    payment = Payment(
+        user=request.user,
+        payment_id=body['transID'],
+        payment_method=body['payment_method'],
+        amount_paid=order.order_total,
+        status=body['status'],
+    )
+    payment.save()
+
+    order.payment = payment
+    order.is_ordered = True
+    order.save()
+
+    # Di chuyển cart items đến OrderProduct model
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    for item in cart_items:
+        order_product = OrderProduct()
+        order_product.order_id = order.id
+        order_product.payment = payment
+        order_product.user_id = request.user.id
+        order_product.product_id = item.product_id
+        order_product.quantity = item.quantity
+        order_product.product_price = item.product.price
+        order_product.ordered = True
+        order_product.save()
+
+        cart_item = CartItem.objects.get(id=item.id)
+        product_variation = cart_item.variations.all()
+        order_product = OrderProduct.objects.get(id=order_product.id)
+        order_product.variations.set(product_variation)
+        order_product.save()
+
+        # Giảm số lượng sp đã bán
+        product = Product.objects.get(id=item.product_id)
+        product.stock -= item.quantity
+        product.save()
+
+    CartItem.objects.filter(user=request.user).delete()
+
+    # Gửi mail xác nhận đơn hàng
+    mail_subject = 'Thank you for your order!'
+    message = render_to_string('order/order_received_email.txt', {
+        'user': request.user,
+        'order': order,
+    })
+    to_email = request.user.email
+    send_email = EmailMessage(mail_subject, message, to=[to_email])
+    send_email.send()
+
+    # Gửi order_number, transID
+    data = {
+        'order_number': order.order_number,
+        'transID': payment.payment_id,
+    }
+    return JsonResponse(data)
 
 
 def place_order(request, total=0, quantity=0):
@@ -60,3 +127,25 @@ def place_order(request, total=0, quantity=0):
             return redirect('checkout')
 
 
+def order_complete(request):
+    order_number = request.GET.get('order_number')
+    transID = request.GET.get('payment_id')
+    try:
+        order = Order.objects.get(order_number=order_number, is_ordered=True)
+        ordered_products = OrderProduct.objects.filter(order_id=order.id)
+        sub_total = 0
+        for item in ordered_products:
+            sub_total += item.product_price*item.quantity
+
+        payment = Payment.objects.get(payment_id=transID)
+        context = {
+            'order': order,
+            'ordered_products': ordered_products,
+            'order_number': order.order_number,
+            'transID': payment.payment_id,
+            'payment': payment,
+            'sub_total': sub_total,
+        }
+    except (Payment.DoesNotExist, Order.DoesNotExist):
+        return redirect('home')
+    return render(request, 'order/order_complete.html', context)
