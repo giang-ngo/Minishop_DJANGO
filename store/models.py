@@ -2,6 +2,8 @@ from django.db import models
 from category.models import Category
 from django.urls import reverse
 from account.models import Account
+from django.db.models import Avg, Count
+
 # Create your models here.
 
 
@@ -19,6 +21,24 @@ class Product(models.Model):
 
     def get_url(self):
         return reverse('product_detail', args=[self.category.slug, self.slug])
+
+    def average_review(self):
+        reviews = ReviewRating.objects.filter(
+            # lọc sp với status=True rồi tổng hợp, tính trung bình bằng hàm Avg
+            product=self, status=True).aggregate(average=Avg('rating'))
+        
+        avg = 0  # khởi tạo biến trung bình ban đầu = 0
+        if reviews['average'] is not None:
+            avg = float(reviews['average'])  # ép kiểu float
+        return avg
+
+    def count_review(self):
+        reviews = ReviewRating.objects.filter(
+            product=self, status=True).aggregate(count=Count('rating'))
+        count = 0
+        if reviews['count'] is not None:
+            count = int(reviews['count'])
+        return count
 
     def __str__(self) -> str:
         return self.product_name

@@ -1,9 +1,12 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from store.models import Product
 from django.db.models import Q
 from django.core.paginator import Paginator
 from category.models import Category
-
+from django.contrib.auth.decorators import login_required
+from order.models import OrderProduct
+from .forms import ReviewForm
+from .models import ReviewRating
 
 
 def store(request, category_slug=None):
@@ -33,7 +36,20 @@ def product_detail(request, category_slug, product_slug):
     single_product = Product.objects.get(
         slug=product_slug, category__slug=category_slug)
 
-    context = {'single_product': single_product}
+    if request.user.is_authenticated:
+        try:
+            order_product = OrderProduct.objects.filter(
+                user=request.user, product__id=single_product.id)
+        except OrderProduct.DoesNotExist:
+            order_product = None
+    else:
+        order_product = None
+
+    reviews = ReviewRating.objects.filter(
+        product_id=single_product.id, status=True).order_by('-created_at')
+
+    context = {'single_product': single_product,
+               'reviews': reviews, 'order_product': order_product}
     return render(request, 'store/product_detail.html', context)
 
 
@@ -48,4 +64,47 @@ def search(request):
     return render(request, 'store/store.html', context)
 
 
+@login_required(login_url='login')
+def review(request, product_id):
+    '''Hàm tạo được nhiều đánh giá'''
+    url = request.META.get('HTTP_REFERER')
+    form = ReviewForm()
 
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            data = ReviewRating()
+            data.product_id = product_id
+            data.user = request.user
+            data.subject = form.cleaned_data['subject']
+            data.review = form.cleaned_data['review']
+            data.rating = form.cleaned_data['rating']
+            data.ip = request.META.get('REMOTE_ADDR')
+            data.rating = form.cleaned_data['rating']
+            data.save()
+            return redirect(url)  # chuyển hướng đến trang hiện tại
+
+
+# @login_required(login_url='login')
+# def review(request, product_id):
+#     '''Hàm tạo được 1 đánh giá, những lần sau chỉ update'''
+#     url = request.META.get("HTTP_REFERER")
+#     if request.method == 'POST':
+#         try:
+#             reviews = ReviewRating.objects.get(
+#                 user__id=request.user.id, product__id=product_id)
+#             form = ReviewForm(request.POST, instance=reviews)
+#             form.save()
+#         except ReviewRating.DoesNotExist:
+#             form = ReviewForm(request.POST)
+#             if form.is_valid():
+#                 data = ReviewRating()
+#                 data.product_id = product_id
+#                 data.user = request.user
+#                 data.subject = form.cleaned_data['subject']
+#                 data.review = form.cleaned_data['review']
+#                 data.rating = form.cleaned_data['rating']
+#                 data.ip = request.META.get('REMOTE_ADDR')
+#                 data.rating = form.cleaned_data['rating']
+#                 data.save()
+#                 return redirect(url)

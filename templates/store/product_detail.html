@@ -28,15 +28,35 @@
                     <h3>{{single_product.product_name}}</h3>
                     <div class="rating d-flex">
                         <p class="text-left mr-4">
-                            <a href="#" class="mr-2">5.0</a>
-                            <a href="#"><span class="ion-ios-star-outline"></span></a>
-                            <a href="#"><span class="ion-ios-star-outline"></span></a>
-                            <a href="#"><span class="ion-ios-star-outline"></span></a>
-                            <a href="#"><span class="ion-ios-star-outline"></span></a>
-                            <a href="#"><span class="ion-ios-star-outline"></span></a>
+                            <a href="#" class="mr-2">{{ single_product.average_review|floatformat:"2" }}
+                            </a>
+                        <div class="rating-star" style="margin-right: 20px;">
+                            <span>
+                                <i class="fa fa-star{% if single_product.average_review < 0.5 %}-o
+                                {% elif single_product.average_review >= 0.5 and single_product.average_review < 1 %}-half-o {% endif %}"
+                                    aria-hidden="true"></i>
+
+                                <i class="fa fa-star{% if single_product.average_review < 1.5 %}-o
+                                {% elif single_product.average_review >= 1.5 and single_product.average_review < 2 %}-half-o 
+                                {% endif %}" aria-hidden="true"></i>
+
+                                <i class="fa fa-star{% if single_product.average_review < 2.5 %}-o
+                                {% elif single_product.average_review >= 2.5 and single_product.average_review < 3 %}-half-o 
+                                {% endif %}" aria-hidden="true"></i>
+
+                                <i class="fa fa-star{% if single_product.average_review < 3.5 %}-o
+                                {% elif single_product.average_review >= 3.5 and single_product.average_review < 4 %}-half-o 
+                                {% endif %}" aria-hidden="true"></i>
+
+                                <i class="fa fa-star{% if single_product.average_review < 4.5 %}-o
+                                {% elif single_product.average_review >= 4.5 and single_product.average_review < 5 %}-half-o 
+                                {% endif %}" aria-hidden="true"></i>
+                            </span>
+                        </div>
+
                         </p>
                         <p class="text-left mr-4">
-                            <a href="#" class="mr-2" style="color: #000;">100 <span
+                            <a href="#" class="mr-2" style="color: #000;">{{single_product.count_review}} <span
                                     style="color: #bbb;">Rating</span></a>
                         </p>
                         <p class="text-left">
@@ -106,7 +126,7 @@
                             type="submit">Add to
                             Cart</button>
 
-                        <a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a>
+                        <a href="{% url 'cart' %}" class="btn btn-primary py-3 px-5">Buy now</a>
                     </p>
                 </form>
 
@@ -161,73 +181,102 @@
                     <div class="tab-pane fade" id="v-pills-3" role="tabpanel" aria-labelledby="v-pills-day-3-tab">
                         <div class="row p-4">
                             <div class="col-md-7">
-                                <h3 class="mb-4">23 Reviews</h3>
+                                <form action="{% url 'review' single_product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <h5>Write Your Review</h5>
+                                    <div>
+                                        <!-- Rating stars -->
+                                        <label>How do you rate this product?</label>
+                                        <br>
+                                        <div class="rate">
+                                            <input type="radio" name="rating" id="rating_value_5" value="5"
+                                                required /><label for="rating_value_5" title="5"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_4.5" value="4.5"
+                                                required /><label for="rating_value_4.5" title="4.5"
+                                                class="half"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_4" value="4"
+                                                required /><label for="rating_value_4" title="4"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_3.5" value="3.5"
+                                                required /><label for="rating_value_3.5" title="3.5"
+                                                class="half"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_3" value="3"
+                                                required /><label for="rating_value_3" title="3"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_2.5" value="2.5"
+                                                required /><label for="rating_value_2.5" title="2.5"
+                                                class="half"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_2" value="2"
+                                                required /><label for="rating_value_2" title="2"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_1.5" value="1.5"
+                                                required /><label for="rating_value_1.5" title="1.5"
+                                                class="half"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_1" value="1"
+                                                required /><label for="rating_value_1" title="1"></label>
+
+                                            <input type="radio" name="rating" id="rating_value_0.5" value="0.5"
+                                                required /><label for="rating_value_0.5" title="0.5"
+                                                class="half"></label>
+                                        </div>
+                                        <br>
+                                        Review Title:
+                                        <input type="text" class="form-control" name="subject">
+                                        <br>
+                                        Review:
+                                        <textarea name="review" rows="4" class="form-control"></textarea>
+                                        <br>
+
+                                        {% if order_product %}
+                                        <input type="submit" value="Submit Review" class="btn btn-primary"
+                                            style="padding: 16px 29px;">
+
+                                        {% else %}
+                                        <p>Please purchase the product to evaluate the product.</p>
+                                        {% endif %}
+
+
+                                    </div>
+                                </form>
+                                <h3 class="mb-4">{{single_product.count_review}} Reviews</h3>
+                                {% for review in reviews %}
                                 <div class="review">
-                                    <div class="user-img" style="background-image: url(images/person_1.jpg)"></div>
+                                    <div class="user-img"
+                                        style="background-image: url({% static 'images/person_1.jpg' %})"></div>
                                     <div class="desc">
                                         <h4>
-                                            <span class="text-left">Jacob Webb</span>
-                                            <span class="text-right">14 March 2018</span>
+                                            <span class="text-left">@{{review.user.username}}</span>
+                                            <span class="text-right">{{review.created_at}}</span>
                                         </h4>
-                                        <p class="star">
+                                        <div class="rating-star">
                                             <span>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
+                                                <i class="fa fa-star{% if review.rating == 0.5 %}-half-o
+                                                {% elif review.rating < 1 %}-o {% endif %}" aria-hidden="true"></i>
+
+                                                <i class="fa fa-star{% if review.rating == 1.5 %}-half-o
+                                                {% elif review.rating < 2 %}-o {% endif %}" aria-hidden="true"></i>
+
+                                                <i class="fa fa-star{% if review.rating == 2.5 %}-half-o
+                                                {% elif review.rating < 3 %}-o {% endif %}" aria-hidden="true"></i>
+
+                                                <i class="fa fa-star{% if review.rating == 3.5 %}-half-o
+                                                {% elif review.rating < 4 %}-o {% endif %}" aria-hidden="true"></i>
+
+                                                <i class="fa fa-star{% if review.rating == 4.5 %}-half-o
+                                                {% elif review.rating < 5 %}-o {% endif %}" aria-hidden="true"></i>
                                             </span>
-                                            <span class="text-right"><a href="#" class="reply"><i
-                                                        class="icon-reply"></i></a></span>
-                                        </p>
-                                        <p>When she reached the first hills of the Italic Mountains, she had a last
-                                            view back on the skyline of her hometown Bookmarksgrov</p>
+                                        </div>
+                                        <h6 style="font-weight: bold;color: #000;">{{review.subject}}</h6>
+                                        <p>{{review.review}}</p>
                                     </div>
                                 </div>
-                                <div class="review">
-                                    <div class="user-img" style="background-image: url(images/person_2.jpg)"></div>
-                                    <div class="desc">
-                                        <h4>
-                                            <span class="text-left">Jacob Webb</span>
-                                            <span class="text-right">14 March 2018</span>
-                                        </h4>
-                                        <p class="star">
-                                            <span>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                            </span>
-                                            <span class="text-right"><a href="#" class="reply"><i
-                                                        class="icon-reply"></i></a></span>
-                                        </p>
-                                        <p>When she reached the first hills of the Italic Mountains, she had a last
-                                            view back on the skyline of her hometown Bookmarksgrov</p>
-                                    </div>
-                                </div>
-                                <div class="review">
-                                    <div class="user-img" style="background-image: url(images/person_3.jpg)"></div>
-                                    <div class="desc">
-                                        <h4>
-                                            <span class="text-left">Jacob Webb</span>
-                                            <span class="text-right">14 March 2018</span>
-                                        </h4>
-                                        <p class="star">
-                                            <span>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                                <i class="ion-ios-star-outline"></i>
-                                            </span>
-                                            <span class="text-right"><a href="#" class="reply"><i
-                                                        class="icon-reply"></i></a></span>
-                                        </p>
-                                        <p>When she reached the first hills of the Italic Mountains, she had a last
-                                            view back on the skyline of her hometown Bookmarksgrov</p>
-                                    </div>
-                                </div>
+                                {% endfor %}
+
                             </div>
                             <div class="col-md-4">
                                 <div class="rating-wrap">

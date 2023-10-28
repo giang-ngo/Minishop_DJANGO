@@ -17,7 +17,7 @@ class VariationAdmin(admin.ModelAdmin):
 
 
 class ReviewRatingAdmin(admin.ModelAdmin):
-    list_display = ('product', 'user',
+    list_display = ('product', 'user', 'rating',
                     'review', 'created_at',)
     list_filter = ('user',)
 

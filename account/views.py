@@ -71,7 +71,7 @@ def loginPage(request):
                     next_page = params['next']
                     return redirect(next_page)
             except:
-                return redirect('dashboard')
+                return redirect('home')
             return redirect('home')
         else:
             messages.error(request, 'Invalid login credentials.')
