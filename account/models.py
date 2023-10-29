@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
-
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 # Create your models here.
 
 
@@ -47,7 +48,7 @@ class Account(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
-    phone_number = models.CharField(max_length=20,blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now_add=True)
@@ -60,6 +61,9 @@ class Account(AbstractBaseUser):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
     objects = MyAccountManager()
 
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
     def __str__(self) -> str:
         return self.email
 
@@ -68,3 +72,27 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, add_label):
         return True
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(blank=True, max_length=100)
+    address_line_2 = models.CharField(blank=True, max_length=100)
+    profile_picture = models.ImageField(default='photos/userprofile/default-avatar.png',
+                                        blank=True, upload_to='photos/userprofile/')
+    city = models.CharField(blank=True, max_length=20)
+    state = models.CharField(blank=True, max_length=20)
+    country = models.CharField(blank=True, max_length=20)
+
+    def full_address(self):
+        return f'{self.address_line_1} {self.address_line_2}'
+
+    def __str__(self) -> str:
+        return self.user.first_name
+
+    # Tự động tạo Profile người dùng mà không phải thêm bằng tay thông qua admin dashboard
+    @receiver(post_save, sender=Account)
+    def createProfile(sender, instance, created, **kwargs):
+        if created:
+            profile = UserProfile(user=instance)
+            profile.save()

@@ -1,0 +1,37 @@
+<aside class="sidebar">
+    <div class="toggle">
+        <a href="#" class="burger js-menu-toggle" data-toggle="collapse" data-target="#main-navbar">
+            <span></span>
+        </a>
+    </div>
+    <div class="side-inner">
+
+        <div class="profile">
+            <img src="{{userprofile.profile_picture.url}}" alt="Image" class="img-fluid"
+                style="width: 80px;height: 80px;object-fit: cover;">
+            <h3 class="name">{{user.full_name}}</h3>
+            <span class="country">{{user.email}}</span>
+        </div>
+
+
+
+        <div class="nav-menu">
+            <ul>
+                <li class="{% if '/accounts/'  == request.path %}active{% endif %}"><a
+                        href="{% url 'dashboard' %}"><i class="fa-solid fa-house-user mr-3"></i>Dashboard</a></li>
+
+                <li class="{% if '/my_orders/' in request.path %}active {% endif %}"><a
+                        href="{% url 'my_orders' %}"><i class="fa-solid fa-bag-shopping mr-3"></i></span>My Orders</a></li>
+
+                <li class="{% if '/edit_profile/' in request.path %}active {% endif %}"><a
+                        href="{% url 'edit_profile' %}"><i class="fa-solid fa-pen mr-3"></i>Edit Profile</a>
+                </li>
+                <li class="{% if '/change_password/' in request.path %}active {% endif %}""><a
+                        href="{% url 'change_password' %}"><i class="fa-solid fa-key mr-3"></i></span>Change Password</a>
+                </li>
+                <li><a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket mr-3"></i>Sign out</a></li>
+            </ul>
+        </div>
+    </div>
+
+</aside>

@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
-from .models import Account
-from .forms import RegisterForm
+from .models import Account, UserProfile
+from .forms import RegisterForm, UserProfileForm, UserForm
 from cart.views import _cart_id
 from cart.models import Cart, CartItem
 import requests
+from order.models import Order, OrderProduct
 
 # active account
 from django.contrib.sites.shortcuts import get_current_site
@@ -13,6 +14,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
+from django.contrib.auth.decorators import login_required
 
 
 def loginPage(request):
@@ -202,3 +204,78 @@ def reset_password(request):
             messages.error(request, 'Password does not match!')
 
     return render(request, 'account/reset_password.html')
+
+
+@login_required(login_url='login')
+def dashboard(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    orders = Order.objects.order_by(
+        '-created_at').filter(user_id=request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    context = {'orders_count': orders_count, 'userprofile': userprofile}
+    return render(request, 'account/dashboard.html', context)
+
+
+@login_required(login_url='login')
+def my_orders(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    orders = Order.objects.filter(
+        user=request.user, is_ordered=True).order_by('-created_at')
+    context = {'orders': orders, 'userprofile': userprofile}
+    return render(request, 'account/my_orders.html', context)
+
+
+@login_required(login_url='login')
+def edit_profile(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    user_form = UserForm(instance=request.user)
+    profile_form = UserProfileForm(instance=userprofile)
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(
+            request.POST, request.FILES, instance=userprofile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('dashboard')
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'userprofile': userprofile,
+    }
+    return render(request, 'account/edit_profile.html', context)
+
+
+@login_required(login_url='login')
+def change_password(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        user = Account.objects.get(username__exact=request.user.username)
+
+        if new_password == confirm_password:
+            success = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                return redirect('dashboard')
+        else:
+            messages.error(request, 'Password does not match!')
+    context = {'userprofile': userprofile}
+    return render(request, 'account/change_password.html', context)
+
+
+@login_required(login_url='login')
+def order_detail(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    subtotal = 0
+    for i in order_detail:
+        subtotal += i.product.price*i.quantity
+
+    context = {'order_detail': order_detail,
+               'order': order, 'subtotal': subtotal}
+    return render(request, 'account/order_detail.html', context)

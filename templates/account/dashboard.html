@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'includes/dashboard_sidebar.html' %}
+
+<main style="margin-top: 100px;">
+    <div class="site-section">
+        <div class="container">
+            <div class="row justify-content-center">
+
+                <div class="col-md-12">
+                    <article class="card">
+                        <header class="card-header">
+                            <strong class="d-inline-block mr-3">My Dashboard</strong>
+                        </header>
+                        <div class="card-body">
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <div class="card" style="text-align: center;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Total Orders</h5>
+                                            <h4>{{orders_count}}</h4>
+                                            <a href="{% url 'my_orders' %}">View Orders</a>
+                                        </div>
+                                    </div>
+                                </div> <!-- card-body .// -->
+
+                                <div class="col-md-9">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">My information</h5>
+                                            <p><span style="color: #000;">Full Name : </span>{{user.full_name}}</p>
+                                            <p><span style="color: #000;">Email : </span>{{user.email}}</p>
+                                            <p><span style="color: #000;">Phone Number : </span>{{user.phone_number}}
+                                            </p>
+                                            <p><span style="color: #000;">Address Line 1 :
+                                                </span>{{user.address_line_1}}
+                                            </p>
+                                            <p><span style="color: #000;">Address Line 2 :
+                                                </span>{{user.address_line_2}}
+                                            </p>
+                                            <p><span style="color: #000;">City: </span>{{user.city}}, <span
+                                                    style="color: #000;">State: </span>{{user.state}}, <span
+                                                    style="color: #000;">Country: </span>
+                                                {{user.country}} </p>
+                                            <a href="{% url 'edit_profile' %}">Edit Profile</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div> <!-- row.// -->
+                        </div> <!-- row.// -->
+
+                    </article> <!-- order-group.// -->
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
