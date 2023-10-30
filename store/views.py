@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from store.models import Product
+from store.models import Product, ProductGallery
 from django.db.models import Q
 from django.core.paginator import Paginator
 from category.models import Category
@@ -48,8 +48,11 @@ def product_detail(request, category_slug, product_slug):
     reviews = ReviewRating.objects.filter(
         product_id=single_product.id, status=True).order_by('-created_at')
 
+    product_gallery = ProductGallery.objects.filter(
+        product_id=single_product.id)
+
     context = {'single_product': single_product,
-               'reviews': reviews, 'order_product': order_product}
+               'reviews': reviews, 'order_product': order_product, 'product_gallery': product_gallery}
     return render(request, 'store/product_detail.html', context)
 
 
