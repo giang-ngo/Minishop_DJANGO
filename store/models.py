@@ -14,6 +14,7 @@ class Product(models.Model):
     price = models.IntegerField()
     image = models.ImageField(upload_to='photos/products')
     stock = models.IntegerField()
+    sold = models.IntegerField(default=0)
     is_available = models.BooleanField(default=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -26,7 +27,7 @@ class Product(models.Model):
         reviews = ReviewRating.objects.filter(
             # lọc sp với status=True rồi tổng hợp, tính trung bình bằng hàm Avg
             product=self, status=True).aggregate(average=Avg('rating'))
-        
+
         avg = 0  # khởi tạo biến trung bình ban đầu = 0
         if reviews['average'] is not None:
             avg = float(reviews['average'])  # ép kiểu float

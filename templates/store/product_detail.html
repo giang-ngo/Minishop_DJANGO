@@ -20,11 +20,11 @@
             <div class="col-lg-6 mb-5 ftco-animate">
                 <article>
                     <article class="gallery-wrap">
-						<div class="img-big-wrap mainImage">
-							<center><img src="{{ single_product.image.url }}"  class="img-fluid"></center>
-						</div> <!-- img-big-wrap.// -->
+                        <div class="img-big-wrap mainImage">
+                            <center><img src="{{ single_product.image.url }}" class="img-fluid"></center>
+                        </div> <!-- img-big-wrap.// -->
 
-					</article> <!-- gallery-wrap .end// -->
+                    </article> <!-- gallery-wrap .end// -->
                     <ul class="thumb">
                         <li>
                             <a href="{{ single_product.image.url }}" target="mainImage"><img
@@ -77,7 +77,8 @@
                                     style="color: #bbb;">Rating</span></a>
                         </p>
                         <p class="text-left">
-                            <a href="#" class="mr-2" style="color: #000;">500 <span style="color: #bbb;">Sold</span></a>
+                            <a href="#" class="mr-2" style="color: #000;">{{single_product.sold}} <span
+                                    style="color: #bbb;">Sold</span></a>
                         </p>
                     </div>
                     <p class="price"><span>${{single_product.price}}</span></p>
@@ -260,14 +261,14 @@
 
                                     </div>
                                 </form>
-                                <h3 class="mb-4">{{single_product.count_review}} Reviews</h3>
+                                <h3 class="mb-4 mt-5">{{single_product.count_review}} Reviews</h3>
                                 {% for review in reviews %}
                                 <div class="review">
-                                    <div class="user-img"
-                                        style="background-image: url({% static 'images/person_1.jpg' %})"></div>
+                                    <img src="{{userprofile.profile_picture.url}}" alt="Image" class="img-fluid"
+                                        style="width: 80px;height: 80px;object-fit: cover;border-radius: 50%;">
                                     <div class="desc">
                                         <h4>
-                                            <span class="text-left">@{{review.user.username}}</span>
+                                            <span class="text-left">@{{review.user.full_name}}</span>
                                             <span class="text-right">{{review.created_at}}</span>
                                         </h4>
                                         <div class="rating-star">

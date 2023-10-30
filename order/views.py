@@ -54,6 +54,7 @@ def payments(request):
         # Giảm số lượng sp đã bán
         product = Product.objects.get(id=item.product_id)
         product.stock -= item.quantity
+        product.sold += item.quantity
         product.save()
 
     CartItem.objects.filter(user=request.user).delete()

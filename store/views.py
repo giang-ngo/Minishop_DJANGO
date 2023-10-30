@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from order.models import OrderProduct
 from .forms import ReviewForm
 from .models import ReviewRating
+from account.models import UserProfile
 
 
 def store(request, category_slug=None):
@@ -22,7 +23,8 @@ def store(request, category_slug=None):
         product_count = products.count()
 
     else:
-        products = Product.objects.all().filter(is_available=True).order_by('-created_date')
+        products = Product.objects.all().filter(
+            is_available=True).order_by('-created_date')
         page = Paginator(products, 6)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
@@ -33,6 +35,7 @@ def store(request, category_slug=None):
 
 
 def product_detail(request, category_slug, product_slug):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
     try:
         single_product = Product.objects.get(
             category__slug=category_slug, slug=product_slug)
@@ -55,7 +58,10 @@ def product_detail(request, category_slug, product_slug):
         product_id=single_product.id)
 
     context = {'single_product': single_product,
-               'order_product': order_product, 'reviews': reviews, 'product_gallery': product_gallery}
+               'order_product': order_product,
+               'reviews': reviews,
+               'product_gallery': product_gallery,
+               'userprofile': userprofile}
     return render(request, 'store/product_detail.html', context)
 
 
