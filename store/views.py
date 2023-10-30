@@ -15,14 +15,14 @@ def store(request, category_slug=None):
     if category_slug != None:
         categories = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(
-            category=categories, is_available=True)
+            category=categories, is_available=True).order_by('-created_date')
         page = Paginator(products, 6)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
         product_count = products.count()
 
     else:
-        products = Product.objects.all().filter(is_available=True)
+        products = Product.objects.all().filter(is_available=True).order_by('-created_date')
         page = Paginator(products, 6)
         page_list = request.GET.get('page')
         page = page.get_page(page_list)
@@ -33,8 +33,11 @@ def store(request, category_slug=None):
 
 
 def product_detail(request, category_slug, product_slug):
-    single_product = Product.objects.get(
-        slug=product_slug, category__slug=category_slug)
+    try:
+        single_product = Product.objects.get(
+            category__slug=category_slug, slug=product_slug)
+    except Exception as e:
+        raise e
 
     if request.user.is_authenticated:
         try:
@@ -52,7 +55,7 @@ def product_detail(request, category_slug, product_slug):
         product_id=single_product.id)
 
     context = {'single_product': single_product,
-               'reviews': reviews, 'order_product': order_product, 'product_gallery': product_gallery}
+               'order_product': order_product, 'reviews': reviews, 'product_gallery': product_gallery}
     return render(request, 'store/product_detail.html', context)
 
 

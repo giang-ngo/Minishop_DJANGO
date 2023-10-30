@@ -18,18 +18,18 @@
         <div class="nav-menu">
             <ul>
                 <li class="{% if '/accounts/'  == request.path %}active{% endif %}"><a
-                        href="{% url 'dashboard' %}"><i class="fa-solid fa-house-user mr-3"></i>Dashboard</a></li>
+                        href="{% url 'dashboard' %}"><span class="icon-home mr-3"></span>Dashboard</a></li>
 
                 <li class="{% if '/my_orders/' in request.path %}active {% endif %}"><a
-                        href="{% url 'my_orders' %}"><i class="fa-solid fa-bag-shopping mr-3"></i></span>My Orders</a></li>
+                        href="{% url 'my_orders' %}"><span class="icon-search2 mr-3"></span>My Orders</a></li>
 
                 <li class="{% if '/edit_profile/' in request.path %}active {% endif %}"><a
-                        href="{% url 'edit_profile' %}"><i class="fa-solid fa-pen mr-3"></i>Edit Profile</a>
+                        href="{% url 'edit_profile' %}"><span class="icon-location-arrow mr-3"></span>Edit Profile</a>
                 </li>
-                <li class="{% if '/change_password/' in request.path %}active {% endif %}""><a
-                        href="{% url 'change_password' %}"><i class="fa-solid fa-key mr-3"></i></span>Change Password</a>
+                <li class="{% if '/change_password/' in request.path %}active {% endif %}"><a
+                        href="{% url 'change_password' %}"><span class="icon-notifications mr-3"></i></span>Change Password</a>
                 </li>
-                <li><a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket mr-3"></i>Sign out</a></li>
+                <li><a href="{% url 'logout' %}"><span class="icon-sign-out mr-3"></span>Sign out</a></li>
             </ul>
         </div>
     </div>
