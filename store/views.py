@@ -71,8 +71,12 @@ def search(request):
         if keyword:
             products = Product.objects.order_by('-created_date').filter(
                 Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
+            page = Paginator(products, 6)
+            page_list = request.GET.get('page')
+            page = page.get_page(page_list)
             product_count = products.count()
-    context = {'products': products, 'product_count': product_count}
+    context = {'products': products,
+               'product_count': product_count, 'page': page, }
     return render(request, 'store/store.html', context)
 
 
