@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'cart',
     'order',
     'blog',
+    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'store.context_processors.category_links',
                 'cart.context_processors.counter',
+                'category.context_processors.category_links',
+                'blog.context_processors.post_category_links',
             ],
         },
     },
