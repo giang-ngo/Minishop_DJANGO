@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'cart',
     'order',
     'blog',
+
     'taggit',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [

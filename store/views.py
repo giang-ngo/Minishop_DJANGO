@@ -96,7 +96,6 @@ def review(request, product_id):
             data.review = form.cleaned_data['review']
             data.rating = form.cleaned_data['rating']
             data.ip = request.META.get('REMOTE_ADDR')
-            data.rating = form.cleaned_data['rating']
             data.save()
             return redirect(url)  # chuyển hướng đến trang hiện tại
 
@@ -121,6 +120,5 @@ def review(request, product_id):
 #                 data.review = form.cleaned_data['review']
 #                 data.rating = form.cleaned_data['rating']
 #                 data.ip = request.META.get('REMOTE_ADDR')
-#                 data.rating = form.cleaned_data['rating']
 #                 data.save()
 #                 return redirect(url)
