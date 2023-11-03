@@ -5,9 +5,6 @@ from taggit.managers import TaggableManager
 from ckeditor.fields import RichTextField
 from django.utils.text import slugify
 from django.db.models import Count
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-from taggit.models import Tag
 
 
 class PostingCategory(models.Model):
@@ -50,7 +47,6 @@ class Post(models.Model):
         ordering = ['-created_on']
 
     # Tự động tạo slug - title theo model
-
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         super(Post, self).save(*args, **kwargs)

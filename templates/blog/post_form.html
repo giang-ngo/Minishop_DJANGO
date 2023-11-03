@@ -30,7 +30,7 @@
                 <form action="{% url 'post_create' %}" class="billing-form" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <h3 class="mb-4 billing-heading">New Post</h3>
-                    <div class="row align-items-end">
+                    <div class="row align-items-end" style="width: 800px;">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="id_title">Title</label>
@@ -79,7 +79,7 @@
                                 <label for="id_tags">Tags</label>
 
                                 <!-- <input type="text" name="address_line_2" class="form-control" placeholder=""> -->
-                                {{form.tags}}
+                                <input type="text" name="tags" data-role="tagsinput" class="form-control" id="tags" name="tags" value="{% for tag in post.tags.all %}{{ tag }},{% endfor %}">
                             </div>
                         </div>
 

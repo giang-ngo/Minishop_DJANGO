@@ -19,7 +19,7 @@
 <section class="ftco-section ftco-degree-bg">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 ftco-animate">
+            <div class="col-lg-8 ftco-animate" style="width: 730px; overflow: hidden;">
                 {{post_single.content|safe}}
                 <div class="tag-widget post-tag-container mb-5 mt-5">
                     <div class="tagcloud">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
             </div> <!-- .col-md-8 -->
-            <div class="col-lg-4 ftco-animate">
+            <div class="col-lg-4 ftco-animate" style="background: white;">
                 <div class="sidebar-box">
                     <form action="{% url 'search' %}" class="search-form" method="GET">
 						<div class="form-group">
@@ -105,7 +105,9 @@
                     <h3 CLASS="heading">Recent Blog</h3>
                     {% for post in posts %}
                     <div class="block-21 mb-4 d-flex">
-                        <a class="blog-img mr-4" style="background-image: url({{post.image.url}});"></a>
+                        <a href="{{post.get_url}}" class="blog-img mr-4">
+							<img loading="lazy" src="{{post.image.url}}" alt="" style="object-fit: cover;width: 100%;">
+						</a>
                         <div class="text">
                             <h3 class="heading-1"><a href="{{post.get_url}}">{{post.title}}</a></h3>
                             <div class="meta">
