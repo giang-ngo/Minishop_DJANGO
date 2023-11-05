@@ -6,19 +6,20 @@ from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from account.models import UserProfile
+from django.http import HttpResponse
 
 # Create your views here.
 
 
 def posts_list(request, category_slug=None):
-    
+
     categories = None
     posts = None
-    
+
     # Lọc bài đăng đã xuất bản
     published_posts = Post.objects.filter(status=1)
     # Lọc các tag với bải đăng đã xuất bản
-    tags = Tag.objects.filter(post__in=published_posts)
+    tags = set(Tag.objects.filter(post__in=published_posts))
 
     if category_slug != None:
         categories = get_object_or_404(PostingCategory, slug=category_slug)
@@ -43,8 +44,12 @@ def posts_list(request, category_slug=None):
     return render(request, 'blog/posts_list.html', context)
 
 
+@login_required(login_url='login')
 def post_detail(request, category_slug, post_slug):
     userprofile = get_object_or_404(UserProfile, user=request.user)
+
+    published_posts = Post.objects.filter(status=1)
+    tags = set(Tag.objects.filter(post__in=published_posts))
 
     posts = Post.objects.all().filter(
         status=1)[:3]
@@ -59,53 +64,88 @@ def post_detail(request, category_slug, post_slug):
                'posts': posts,
                'userprofile': userprofile,
                'comments': comments,
+               'tags': tags,
                }
     return render(request, 'blog/post_single.html', context)
 
 
 @login_required(login_url='login')
 def post_create(request):
-    categories = PostingCategory.objects.all()
     form = PostForm()
     if request.method == 'POST':
-        category_name = request.POST.get('category')
-        category = PostingCategory.objects.get(category_name=category_name)
-        # tags = request.POST.getlist('tags')
-        tags = request.POST.get('tags').split(',')
-        post = Post.objects.create(
-            author=request.user,
-            title=request.POST.get('title'),
-            content=request.POST.get('content'),
-            image=request.FILES.get('image'),
-            category=category,
-        )
-        for tag_name in tags:
-            tag, _ = Tag.objects.get_or_create(name=tag_name.title())
-            post.tags.add(tag)
-        post.save()
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            
+            # Lấy các tag với các tag đc viết bằng chữ thường và không trùng lặp
+            tags = request.POST.get('tags').split(',')
 
-        return redirect('posts_list')
-    context = {'form': form, 'categories': categories}
+            for tag_name in tags:
+                tag, _ = Tag.objects.get_or_create(name=tag_name.strip().lower())
+                post.tags.add(tag)
+            post.save()
+
+            return redirect('posts_list')
+    context = {'form': form}
     return render(request, 'blog/post_form.html', context)
 
 
+@login_required(login_url='login')
+def post_update(request, post_slug):
+    post = Post.objects.get(slug=post_slug)
+    form = PostForm(instance=post)
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            tags = request.POST.get('tags').split(',')
+            post.tags.clear()
+
+            for tag_name in tags:
+                tag, _ = Tag.objects.get_or_create(name=tag_name.strip().lower())
+                post.tags.add(tag)
+            post.save()
+
+            return redirect('posts_list')
+
+    context = {'form': form, 'post': post}
+    return render(request, 'blog/post_form.html', context)
+
+
+@login_required(login_url='login')
+def post_delete(request, post_slug):
+    post = Post.objects.get(slug=post_slug)
+    if request.user != post.author:
+        return HttpResponse('You are not allowed here')
+
+    post.delete()
+    return redirect('posts_list')
+
+
 def tagged(request, tag_slug):
-    
+
     posts = Post.objects.all().filter(
         status=1)
     recent_posts = Post.objects.all().filter(
-            status=1)[:3]
-    tags = Tag.objects.all()
+        status=1)[:3]
+    # Lọc bài đăng đã xuất bản
+    published_posts = Post.objects.filter(status=1)
+    # Lọc các tag với bải đăng đã xuất bản
+    tags = set(Tag.objects.filter(post__in=published_posts))
     tag = get_object_or_404(Tag, slug=tag_slug)
+
+    
     page = Paginator(Post.objects.all().filter(
-        tags=tag,status=1), 5)
+        tags=tag, status=1), 5)
     page_list = request.GET.get('page')
     page = page.get_page(page_list)
     context = {
         'tags': tags,
         'page': page,
         'posts': posts,
-        'recent_posts':recent_posts,
+        'recent_posts': recent_posts,
     }
     return render(request, 'blog/posts_list.html', context)
 

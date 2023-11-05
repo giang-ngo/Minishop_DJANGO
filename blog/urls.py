@@ -4,6 +4,8 @@ from .import views
 urlpatterns = [
     path('', views.posts_list, name='posts_list'),
     path('post_create/', views.post_create, name='post_create'),
+    path('post_update/<slug:post_slug>/', views.post_update, name='post_update'),
+    path('post_delete/<slug:post_slug>/', views.post_delete, name='post_delete'),
 
 
     path('tag/<slug:tag_slug>/', views.tagged, name='tag'),

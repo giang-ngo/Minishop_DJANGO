@@ -10293,7 +10293,6 @@ textarea.form-control {
       color: gray; }
 
 .tagcloud a {
-  text-transform: uppercase;
   display: inline-block;
   padding: 4px 10px;
   margin-bottom: 7px;

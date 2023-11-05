@@ -45,6 +45,14 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['-created_on']
+    
+    # cho các tags được viết thường
+    def clean_tags(self):
+        tags = self.cleaned_data.get('tags').lower()
+        if tags:
+            tags = [t.lower() for t in tags]
+
+        return tags
 
     # Tự động tạo slug - title theo model
     def save(self, *args, **kwargs):
@@ -64,6 +72,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
 
 
 class Comment(models.Model):
