@@ -1,7 +1,7 @@
 from django.db import models
 from category.models import Category
 from django.urls import reverse
-from account.models import Account
+from user_account.models import Account
 from django.db.models import Avg, Count
 
 # Create your models here.
@@ -67,7 +67,7 @@ class Variation(models.Model):
     is_active = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    object = VariationManager()
+    objects = VariationManager()
 
     def __str__(self) -> str:
         return self.variation_value

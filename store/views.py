@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from order.models import OrderProduct
 from .forms import ReviewForm
 from .models import ReviewRating
-from account.models import UserProfile
+from user_account.models import UserProfile
 
 
 def store(request, category_slug=None):
@@ -34,35 +34,27 @@ def store(request, category_slug=None):
     return render(request, 'store/store.html', context)
 
 
+from django.shortcuts import render, get_object_or_404
+from .models import Product, Variation, ReviewRating, ProductGallery
+
 def product_detail(request, category_slug, product_slug):
-    userprofile = get_object_or_404(UserProfile, user=request.user)
-    try:
-        single_product = Product.objects.get(
-            category__slug=category_slug, slug=product_slug)
-    except Exception as e:
-        raise e
+    single_product = get_object_or_404(Product, category__slug=category_slug, slug=product_slug)
+    reviews = ReviewRating.objects.filter(product=single_product, status=True)
+    product_gallery = ProductGallery.objects.filter(product=single_product)
 
-    if request.user.is_authenticated:
-        try:
-            order_product = OrderProduct.objects.filter(
-                user=request.user, product__id=single_product.id)
-        except OrderProduct.DoesNotExist:
-            order_product = None
-    else:
-        order_product = None
+    # Fetch variations
+    colors = Variation.objects.filter(product=single_product, variation_category='color', is_active=True)
+    sizes = Variation.objects.filter(product=single_product, variation_category='size', is_active=True)
 
-    reviews = ReviewRating.objects.filter(
-        product_id=single_product.id, status=True).order_by('-created_at')
-
-    product_gallery = ProductGallery.objects.filter(
-        product_id=single_product.id)
-
-    context = {'single_product': single_product,
-               'order_product': order_product,
-               'reviews': reviews,
-               'product_gallery': product_gallery,
-               'userprofile': userprofile}
+    context = {
+        'single_product': single_product,
+        'reviews': reviews,
+        'product_gallery': product_gallery,
+        'colors': colors,
+        'sizes': sizes,
+    }
     return render(request, 'store/product_detail.html', context)
+
 
 
 def search(request):
@@ -122,3 +114,6 @@ def review(request, product_id):
 #                 data.ip = request.META.get('REMOTE_ADDR')
 #                 data.save()
 #                 return redirect(url)
+
+
+

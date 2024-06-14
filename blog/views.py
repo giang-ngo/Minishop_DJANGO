@@ -5,7 +5,7 @@ from taggit.models import Tag
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from account.models import UserProfile
+from user_account.models import UserProfile
 from django.http import HttpResponse
 
 # Create your views here.
@@ -181,3 +181,5 @@ def comment(request, post_id):
             data.post_id = post_id
             data.save()
             return redirect(url)
+
+

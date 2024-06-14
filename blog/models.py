@@ -1,5 +1,5 @@
 from django.db import models
-from account.models import Account
+from user_account.models import Account
 from django.urls import reverse
 from taggit.managers import TaggableManager
 from ckeditor.fields import RichTextField
@@ -45,14 +45,6 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['-created_on']
-    
-    # cho các tags được viết thường
-    def clean_tags(self):
-        tags = self.cleaned_data.get('tags').lower()
-        if tags:
-            tags = [t.lower() for t in tags]
-
-        return tags
 
     # Tự động tạo slug - title theo model
     def save(self, *args, **kwargs):
@@ -74,10 +66,12 @@ class Post(models.Model):
         return self.title
 
 
-
 class Comment(models.Model):
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, null=True)
+    parent = models.ForeignKey(
+        'self', related_name='parent_comment', on_delete=models.CASCADE,
+        null=True)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     body = models.TextField()
     created = models.DateTimeField(auto_now_add=True)

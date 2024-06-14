@@ -26,8 +26,9 @@ SECRET_KEY = 'django-insecure-zd&m!7wx*bfl98=klo56m6&d@wxdt9#)42pi*22x1n!==sy+k0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',
+                 '6d4d-2402-800-63f3-f8af-a1c8-cb01-753d-236b.ngrok-free.app']
+SITE_ID = 2
 
 # Application definition
 
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'account',
+    'user_account',
     'category',
     'store',
     'cart',
@@ -47,6 +48,11 @@ INSTALLED_APPS = [
 
     'taggit',
     'ckeditor',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     # 'reset_migrations',
 ]
 
@@ -59,6 +65,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_session_timeout.middleware.SessionTimeoutMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'cart.middleware.CartMiddleware',
 ]
 
 ROOT_URLCONF = 'minishop.urls'
@@ -90,7 +98,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'minishop.wsgi.application'
-AUTH_USER_MODEL = 'account.Account'
+AUTH_USER_MODEL = 'user_account.Account'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -159,3 +167,43 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('email')
 EMAIL_HOST_PASSWORD = os.environ.get('password')
 EMAIL_USE_TLS = True
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+LOGIN_REDIRECT_URL = '/'  # URL của trang chủ hoặc trang khác sau khi đăng nhập thành công
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Yêu cầu xác thực email
+ACCOUNT_EMAIL_REQUIRED = True  # Yêu cầu người dùng cung cấp email
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_UNIQUE_EMAIL = True
+SOCIALACCOUNT_LOGIN_ON_GET = True  # Bỏ qua trang xác nhận trung gian và chuyển thẳng đến đăng nhập Google
+
+
+ACCOUNT_UNIQUE_EMAIL = True
+
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '89299710333-ctnuqc8t3vafk829508qoerstbf64tj4.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'REDIRECT_URI': 'http://127.0.0.1:8000/accounts/google/login/callback',
+    }
+}
+
+ACCOUNT_ADAPTER = 'user_account.adapters.MyAccountAdapter'
+
