@@ -27,7 +27,12 @@
                         href="{% url 'edit_profile' %}"><span class="icon-location-arrow mr-3"></span>Edit Profile</a>
                 </li>
                 <li class="{% if '/change_password/' in request.path %}active {% endif %}"><a
-                        href="{% url 'change_password' %}"><span class="icon-notifications mr-3"></i></span>Change Password</a>
+                        href="{% url 'change_password' %}"><span class="icon-notifications mr-3"></i></span>Change
+                        Password</a>
+                </li>
+                <li class="{% if '/change_password/' in request.path %}active {% endif %}"><a
+                        href="{% url 'update_recovery_phone' %}"><span class="icon-notifications mr-3"></i></span>Add
+                        account recovery phone number</a>
                 </li>
                 <li><a href="{% url 'logout' %}"><span class="icon-sign-out mr-3"></span>Sign out</a></li>
             </ul>

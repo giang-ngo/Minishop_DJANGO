@@ -1,0 +1,26 @@
+
+
+{% block content %}
+  <h2>Update Recovery Phone Number</h2>
+  <form method="POST" action="{% url 'update_recovery_phone' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update</button>
+  </form>
+
+   <!-- Display form errors -->
+   {% if form.errors %}
+   <div class="error">
+     <ul>
+     {% for field in form %}
+       {% for error in field.errors %}
+         <li>{{ error }}</li>
+       {% endfor %}
+     {% endfor %}
+     {% for error in form.non_field_errors %}
+       <li>{{ error }}</li>
+     {% endfor %}
+     </ul>
+   </div>
+ {% endif %}
+{% endblock %}

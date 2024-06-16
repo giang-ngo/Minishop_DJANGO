@@ -204,6 +204,9 @@ SOCIALACCOUNT_PROVIDERS = {
         'REDIRECT_URI': 'http://127.0.0.1:8000/accounts/google/login/callback',
     }
 }
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN =  os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')
 
 ACCOUNT_ADAPTER = 'user_account.adapters.MyAccountAdapter'
 
