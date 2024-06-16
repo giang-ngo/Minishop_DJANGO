@@ -20,8 +20,15 @@ urlpatterns = [
     path('order_detail/<int:order_id>/',
          views.order_detail, name='order_detail'),
 
+    # url thêm phone otp
     path('update_recovery_phone/', views.update_recovery_phone_number,
          name='update_recovery_phone'),
     path('verify_recovery_phone/', views.verify_recovery_phone,
          name='verify_recovery_phone'),
+
+    # url reset password bằng otp
+    path('request-password-reset/', views.request_password_reset,
+         name='request_password_reset'),
+    path('verify-otp-for-password-reset/', views.verify_otp_for_password_reset,
+         name='verify_otp_for_password_reset'),
 ]

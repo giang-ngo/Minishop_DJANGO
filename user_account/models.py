@@ -1,5 +1,3 @@
-# models.py
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.dispatch import receiver
@@ -42,7 +40,7 @@ class Account(AbstractBaseUser):
     username = models.CharField(max_length=50)
     email = models.EmailField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)  # Phone number is optional
-    recovery_phone_number = models.CharField(max_length=20, blank=True, null=True)  # Recovery phone number
+    recovery_phone_number = models.CharField(max_length=20, blank=True, null=True,unique=True)  # Recovery phone number
     recovery_phone_verified = models.BooleanField(default=False)  # Verification status for the recovery phone number
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)

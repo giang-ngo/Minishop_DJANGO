@@ -1,10 +1,8 @@
-
-
 {% block content %}
-  <h2>Verify Recovery Phone Number</h2>
-  <form method="POST" action="{% url 'verify_recovery_phone' %}">
+<h2>Verify Recovery Phone Number</h2>
+<form method="POST" action="{% url 'verify_recovery_phone' %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Verify</button>
-  </form>
+</form>
 {% endblock %}

@@ -1,7 +1,5 @@
-# forms.py
 from django import forms
 from .models import Account, UserProfile
-
 
 
 class RegisterForm(forms.ModelForm):
@@ -63,20 +61,6 @@ class UserProfileForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = 'form-control'
 
 
-class RequestOTPForm(forms.Form):
-    phone_number = forms.CharField(max_length=15)
-
-    def clean(self):
-        cleaned_data = super(RequestOTPForm, self).clean()
-        phone_number = cleaned_data.get('phone_number')
-
-        # Format phone number
-        if phone_number:
-            cleaned_data['phone_number'] = format_phone_number(phone_number)
-
-        return cleaned_data
-
-
 class VerifyOTPForm(forms.Form):
     otp = forms.CharField(max_length=6)
     new_password = forms.CharField(widget=forms.PasswordInput(
@@ -93,6 +77,7 @@ class VerifyOTPForm(forms.Form):
             raise forms.ValidationError('Passwords do not match!')
 
         return cleaned_data
+
 
 class UpdateRecoveryPhoneNumberForm(forms.ModelForm):
     class Meta:
@@ -123,12 +108,30 @@ class VerifyRecoveryPhoneForm(forms.Form):
         return otp
 
 
+class RequestPasswordResetForm(forms.Form):
+    recovery_phone_number = forms.CharField(max_length=20)
 
-class VerifyRecoveryPhoneForm(forms.Form):
-    otp = forms.CharField(max_length=6, required=True)
+    def clean_recovery_phone_number(self):
+        recovery_phone_number = self.cleaned_data['recovery_phone_number']
+        if not Account.objects.filter(recovery_phone_number=recovery_phone_number).exists():
+            raise forms.ValidationError(
+                'Recovery phone number does not exist.')
+        return recovery_phone_number
 
-    def clean_otp(self):
-        otp = self.cleaned_data.get('otp')
-        if len(otp) != 6 or not otp.isdigit():
-            raise forms.ValidationError('Invalid OTP.')
-        return otp
+
+class VerifyOTPForPasswordResetForm(forms.Form):
+    otp = forms.CharField(max_length=6)
+    new_password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'New Password'}))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'placeholder': 'Confirm Password'}))
+
+    def clean(self):
+        cleaned_data = super(VerifyOTPForPasswordResetForm, self).clean()
+        new_password = cleaned_data.get('new_password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if new_password != confirm_password:
+            raise forms.ValidationError('Passwords do not match!')
+
+        return cleaned_data

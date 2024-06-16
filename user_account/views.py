@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
 from .models import Account, UserProfile
-from .forms import RegisterForm, UserProfileForm, UserForm, UpdateRecoveryPhoneNumberForm, VerifyRecoveryPhoneForm
+from .forms import RegisterForm, UserProfileForm, UserForm, UpdateRecoveryPhoneNumberForm, VerifyRecoveryPhoneForm, RequestPasswordResetForm, VerifyOTPForPasswordResetForm
 from cart.views import _cart_id
 from cart.models import Cart, CartItem
 import requests
@@ -316,8 +316,7 @@ def verify_recovery_phone(request):
     return render(request, 'user_account/verify_recovery_phone.html', {'form': form})
 
 
-# do đang dùng bản TWILIO free nên sẽ không custom được tin nhắn
-def send_otp(phone_number, sender_name="YourCompanyName"):
+def send_otp(phone_number, sender_name="Minishop"):
     otp = random.randint(100000, 999999)
     account_sid = settings.TWILIO_ACCOUNT_SID
     auth_token = settings.TWILIO_AUTH_TOKEN
@@ -338,3 +337,43 @@ def send_otp(phone_number, sender_name="YourCompanyName"):
         to=phone_number
     )
     return otp
+
+
+def request_password_reset(request):
+    if request.method == 'POST':
+        form = RequestPasswordResetForm(request.POST)
+        if form.is_valid():
+            recovery_phone_number = form.cleaned_data['recovery_phone_number']
+            user = Account.objects.get(
+                recovery_phone_number=recovery_phone_number)
+            otp = send_otp(recovery_phone_number)
+            request.session['otp'] = otp
+            request.session['user_id'] = user.id
+            messages.success(
+                request, 'OTP has been sent to your recovery phone number.')
+            return redirect('verify_otp_for_password_reset')
+    else:
+        form = RequestPasswordResetForm()
+    return render(request, 'user_account/request_password_reset.html', {'form': form})
+
+
+def verify_otp_for_password_reset(request):
+    if request.method == 'POST':
+        form = VerifyOTPForPasswordResetForm(request.POST)
+        if form.is_valid():
+            otp = form.cleaned_data['otp']
+            if otp == str(request.session.get('otp')):
+                user_id = request.session.get('user_id')
+                user = Account.objects.get(id=user_id)
+                new_password = form.cleaned_data['new_password']
+                user.set_password(new_password)
+                user.save()
+                del request.session['otp']
+                del request.session['user_id']
+                messages.success(request, 'Password reset successful.')
+                return redirect('login')
+            else:
+                form.add_error('otp', 'Invalid OTP')
+    else:
+        form = VerifyOTPForPasswordResetForm()
+    return render(request, 'user_account/verify_otp_for_password_reset.html', {'form': form})
