@@ -20,6 +20,8 @@ urlpatterns = [
     path('order_detail/<int:order_id>/',
          views.order_detail, name='order_detail'),
 
+    # do mình dùng ở đây là tài khoản Twilio thử nghiệm nên bị giới hạn số điện thoại bạn có thể sử dụng phiên bản trả phí để có thể xác thực otp với bất kì số điện thoại nào
+
     # url thêm phone otp
     path('update_recovery_phone/', views.update_recovery_phone_number,
          name='update_recovery_phone'),
@@ -27,8 +29,6 @@ urlpatterns = [
          name='verify_recovery_phone'),
 
     # url reset password bằng otp
-    path('request-password-reset/', views.request_password_reset,
-         name='request_password_reset'),
     path('verify-otp-for-password-reset/', views.verify_otp_for_password_reset,
          name='verify_otp_for_password_reset'),
 ]

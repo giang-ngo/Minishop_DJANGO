@@ -113,9 +113,31 @@ class RequestPasswordResetForm(forms.Form):
 
     def clean_recovery_phone_number(self):
         recovery_phone_number = self.cleaned_data['recovery_phone_number']
+        # Loại bỏ khoảng trắng hoặc ký tự không phải số
+        recovery_phone_number = ''.join(
+            filter(str.isdigit, recovery_phone_number))
+
+        # Định dạng số điện thoại Việt Nam
+        if recovery_phone_number.startswith('0'):
+            recovery_phone_number = '84' + recovery_phone_number[1:]
+        elif recovery_phone_number.startswith('84'):
+            # Không làm gì vì số đã đúng định dạng
+            pass
+        elif recovery_phone_number.startswith('+84'):
+            # Remove the '+' sign
+            recovery_phone_number = recovery_phone_number[1:]
+        else:
+            raise forms.ValidationError(
+                'Số điện thoại không hợp lệ. Vui lòng nhập số bắt đầu bằng 0 hoặc 84.')
+
+        # Thêm dấu '+' để định dạng thành số quốc tế
+        recovery_phone_number = '+' + recovery_phone_number
+
+        # Kiểm tra xem số điện thoại đã tồn tại trong cơ sở dữ liệu hay chưa
         if not Account.objects.filter(recovery_phone_number=recovery_phone_number).exists():
             raise forms.ValidationError(
-                'Recovery phone number does not exist.')
+                'Số điện thoại khôi phục không tồn tại.')
+
         return recovery_phone_number
 
 

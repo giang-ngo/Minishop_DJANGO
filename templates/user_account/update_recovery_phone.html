@@ -1,24 +1,32 @@
-{% block content %}
-<h2>Update Recovery Phone Number</h2>
-<form method="POST" action="{% url 'update_recovery_phone' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-</form>
+{% extends 'base.html' %}
 
-<!-- Display form errors -->
-{% if form.errors %}
-<div class="error">
-    <ul>
-        {% for field in form %}
-        {% for error in field.errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-        {% endfor %}
-        {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+{% block content %}
+<section class="container-login forms">
+    <!-- Update Recovery Phone Number Form -->
+    <div class="form login">
+        <div class="form-content">
+            <header>Update Recovery Phone Number</header>
+            <form action="{% url 'update_recovery_phone' %}" method="POST">
+                {% csrf_token %}
+                {% if form.errors %}
+                <ul style="color: red;">
+                    {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="field input-field">
+                    <input type="text" placeholder="Recovery Phone Number" class="input"
+                        name="recovery_phone_number" required>
+                </div>
+
+                <div class="field button-field mt-4">
+                    <button type="submit">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

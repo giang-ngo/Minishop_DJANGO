@@ -1,8 +1,31 @@
+{% extends 'base.html' %}
+
 {% block content %}
-<h2>Verify Recovery Phone Number</h2>
-<form method="POST" action="{% url 'verify_recovery_phone' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Verify</button>
-</form>
+<section class="container-login forms">
+    <!-- Verify Recovery Phone Number Form -->
+    <div class="form login">
+        <div class="form-content">
+            <header>Verify Recovery Phone Number</header>
+            <form action="{% url 'verify_recovery_phone' %}" method="POST">
+                {% csrf_token %}
+                {% if form.errors %}
+                <ul style="color: red;">
+                    {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="field input-field">
+                    <input type="text" placeholder="Enter OTP" class="input" name="otp" required>
+                </div>
+
+                <div class="field button-field mt-4">
+                    <button type="submit">Verify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

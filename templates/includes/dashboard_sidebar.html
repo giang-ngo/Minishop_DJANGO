@@ -18,21 +18,24 @@
         <div class="nav-menu">
             <ul>
                 <li class="{% if '/accounts/'  == request.path %}active{% endif %}"><a
-                        href="{% url 'dashboard' %}"><span class="icon-home mr-3"></span>Dashboard</a></li>
+                        href="{% url 'dashboard' %}"><span class="icon-home mr-3 "></span>Dashboard</a></li>
 
                 <li class="{% if '/my_orders/' in request.path %}active {% endif %}"><a
-                        href="{% url 'my_orders' %}"><span class="icon-search2 mr-3"></span>My Orders</a></li>
+                        href="{% url 'my_orders' %}"><span class="icon-search2 mr-3 "></span>My
+                        Orders</a></li>
 
                 <li class="{% if '/edit_profile/' in request.path %}active {% endif %}"><a
-                        href="{% url 'edit_profile' %}"><span class="icon-location-arrow mr-3"></span>Edit Profile</a>
+                        href="{% url 'edit_profile' %}"><span style="font-size: 17px;" class="icon-location-arrow mr-3"></span>Edit
+                        Profile</a>
                 </li>
                 <li class="{% if '/change_password/' in request.path %}active {% endif %}"><a
-                        href="{% url 'change_password' %}"><span class="icon-notifications mr-3"></i></span>Change
+                        href="{% url 'change_password' %}"><span class="icon-notifications mr-3 "></span>Change
                         Password</a>
                 </li>
-                <li class="{% if '/change_password/' in request.path %}active {% endif %}"><a
-                        href="{% url 'update_recovery_phone' %}"><span class="icon-notifications mr-3"></i></span>Add
-                        account recovery phone number</a>
+                <li class="{% if '/update_recovery_phone/' in request.path %}active {% endif %}"><a
+                        href="{% url 'update_recovery_phone' %}"><span style="font-size: 12px;"
+                            class="fas fa-key mr-3 "></span>
+                            Add recovery phone</a>
                 </li>
                 <li><a href="{% url 'logout' %}"><span class="icon-sign-out mr-3"></span>Sign out</a></li>
             </ul>
