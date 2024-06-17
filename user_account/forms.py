@@ -1,5 +1,7 @@
 from django import forms
 from .models import Account, UserProfile
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
 
 class RegisterForm(forms.ModelForm):
@@ -109,36 +111,36 @@ class VerifyRecoveryPhoneForm(forms.Form):
 
 
 class RequestPasswordResetForm(forms.Form):
-    recovery_phone_number = forms.CharField(max_length=20)
+    email_or_phone = forms.CharField(max_length=100, required=True)
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
-    def clean_recovery_phone_number(self):
-        recovery_phone_number = self.cleaned_data['recovery_phone_number']
-        # Loại bỏ khoảng trắng hoặc ký tự không phải số
-        recovery_phone_number = ''.join(
-            filter(str.isdigit, recovery_phone_number))
+    def clean_email_or_phone(self):
+        email_or_phone = self.cleaned_data['email_or_phone']
 
-        # Định dạng số điện thoại Việt Nam
-        if recovery_phone_number.startswith('0'):
-            recovery_phone_number = '84' + recovery_phone_number[1:]
-        elif recovery_phone_number.startswith('84'):
-            # Không làm gì vì số đã đúng định dạng
-            pass
-        elif recovery_phone_number.startswith('+84'):
-            # Remove the '+' sign
-            recovery_phone_number = recovery_phone_number[1:]
+        if '@' in email_or_phone:
+            if not Account.objects.filter(email=email_or_phone).exists():
+                raise forms.ValidationError(
+                    'Account with this email does not exist.')
         else:
-            raise forms.ValidationError(
-                'Số điện thoại không hợp lệ. Vui lòng nhập số bắt đầu bằng 0 hoặc 84.')
+            phone_number = ''.join(filter(str.isdigit, email_or_phone))
+            if phone_number.startswith('0'):
+                phone_number = '84' + phone_number[1:]
+            elif phone_number.startswith('84'):
+                pass
+            elif phone_number.startswith('+84'):
+                phone_number = phone_number[1:]
+            else:
+                raise forms.ValidationError(
+                    'Số điện thoại không hợp lệ. Vui lòng nhập số bắt đầu bằng 0 hoặc 84.')
 
-        # Thêm dấu '+' để định dạng thành số quốc tế
-        recovery_phone_number = '+' + recovery_phone_number
+            phone_number = '+' + phone_number
+            if not Account.objects.filter(recovery_phone_number=phone_number).exists():
+                raise forms.ValidationError(
+                    'Số điện thoại khôi phục không tồn tại.')
 
-        # Kiểm tra xem số điện thoại đã tồn tại trong cơ sở dữ liệu hay chưa
-        if not Account.objects.filter(recovery_phone_number=recovery_phone_number).exists():
-            raise forms.ValidationError(
-                'Số điện thoại khôi phục không tồn tại.')
+            email_or_phone = phone_number
 
-        return recovery_phone_number
+        return email_or_phone
 
 
 class VerifyOTPForPasswordResetForm(forms.Form):

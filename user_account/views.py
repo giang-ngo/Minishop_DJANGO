@@ -140,13 +140,13 @@ def activate(request, uidb64, token):
 
 def forgot_password(request):
     if request.method == 'POST':
-        email_or_phone = request.POST.get('email_or_phone')
-        if email_or_phone:
+        form = RequestPasswordResetForm(request.POST)
+        if form.is_valid():
+            email_or_phone = form.cleaned_data['email_or_phone']
             if '@' in email_or_phone:
-                # Xử lý email
+                # Handle email
                 if Account.objects.filter(email=email_or_phone).exists():
                     user = Account.objects.get(email__exact=email_or_phone)
-
                     current_site = get_current_site(request)
                     mail_subject = 'Reset Your Password.'
                     message = render_to_string('user_account/reset_password_email.txt', {
@@ -159,7 +159,6 @@ def forgot_password(request):
                     send_email = EmailMessage(
                         mail_subject, message, to=[to_email])
                     send_email.send()
-
                     messages.success(
                         request, 'Password reset email has been sent.')
                     return redirect('login')
@@ -167,26 +166,27 @@ def forgot_password(request):
                     messages.error(
                         request, 'Account with this email does not exist.')
             else:
-                # Xử lý số điện thoại
-                form = RequestPasswordResetForm(
-                    {'recovery_phone_number': email_or_phone})
-                if form.is_valid():
-                    recovery_phone_number = form.cleaned_data['recovery_phone_number']
+                # Handle phone number
+                recovery_phone_number = form.cleaned_data['email_or_phone']
+                if Account.objects.filter(recovery_phone_number=recovery_phone_number).exists():
                     user = Account.objects.get(
                         recovery_phone_number=recovery_phone_number)
                     otp = send_otp(recovery_phone_number)
                     request.session['otp'] = otp
                     request.session['user_id'] = user.id
                     messages.success(
-                        request, 'OTP đã được gửi đến số điện thoại khôi phục của bạn.')
+                        request, 'OTP has been sent to your recovery phone number.')
                     return redirect('verify_otp_for_password_reset')
                 else:
-                    for error in form.errors.values():
-                        messages.error(request, error)
+                    messages.error(
+                        request, 'Account with this phone number does not exist.')
         else:
-            messages.error(
-                request, 'Please enter a valid email or phone number.')
-    return render(request, 'user_account/forgot_password.html')
+            for error in form.errors.values():
+                messages.error(request, error)
+    else:
+        form = RequestPasswordResetForm()
+
+    return render(request, 'user_account/forgot_password.html', {'form': form})
 
 
 def reset_password_validate(request, uidb64, token):

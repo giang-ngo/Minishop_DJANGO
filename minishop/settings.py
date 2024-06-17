@@ -26,9 +26,8 @@ SECRET_KEY = 'django-insecure-zd&m!7wx*bfl98=klo56m6&d@wxdt9#)42pi*22x1n!==sy+k0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1',
-                 '6d4d-2402-800-63f3-f8af-a1c8-cb01-753d-236b.ngrok-free.app']
-SITE_ID = 2
+ALLOWED_HOSTS = []
+SITE_ID = 1
 
 # Application definition
 
@@ -53,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_recaptcha',
     # 'reset_migrations',
 ]
 
@@ -176,16 +176,17 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-LOGIN_REDIRECT_URL = '/'  # URL của trang chủ hoặc trang khác sau khi đăng nhập thành công
+# URL của trang chủ hoặc trang khác sau khi đăng nhập thành công
+LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Yêu cầu xác thực email
 ACCOUNT_EMAIL_REQUIRED = True  # Yêu cầu người dùng cung cấp email
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_UNIQUE_EMAIL = True
-SOCIALACCOUNT_LOGIN_ON_GET = True  # Bỏ qua trang xác nhận trung gian và chuyển thẳng đến đăng nhập Google
+# Bỏ qua trang xác nhận trung gian và chuyển thẳng đến đăng nhập Google
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 ACCOUNT_UNIQUE_EMAIL = True
-
 
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -205,9 +206,15 @@ SOCIALACCOUNT_PROVIDERS = {
         'REDIRECT_URI': 'http://127.0.0.1:8000/accounts/google/login/callback',
     }
 }
+
+# OTP verification
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN =  os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')
 
-ACCOUNT_ADAPTER = 'user_account.adapters.MyAccountAdapter'
+# khóa site và secret từ Google reCAPTCHA
+RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC')
+RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE')
+SILENCED_SYSTEM_CHECKS = ['django_recaptcha.recaptcha_test_key_error']
 
+ACCOUNT_ADAPTER = 'user_account.adapters.MyAccountAdapter'
